@@ -27,6 +27,7 @@ namespace _2024_11_25
         public MainWindow()
         {
             InitializeComponent();
+            LoadData();
         }
 
         private async void addButton_Click(object sender, RoutedEventArgs e)
@@ -40,11 +41,37 @@ namespace _2024_11_25
             {
                 HttpResponseMessage response = await httpClient.PostAsync("http://localhost:4444/api/cats", body);
                 response.EnsureSuccessStatusCode();
+                nameField.Text = "";
+                ageField.Text = "";
+                LoadData();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
         }
+
+        async void LoadData()
+        {
+            try
+            {
+                HttpResponseMessage response = await httpClient.GetAsync("http://localhost:4444/api/cats");
+                response.EnsureSuccessStatusCode();
+                string jsonData = await response.Content.ReadAsStringAsync();
+                List<Cat> cats = JsonConvert.DeserializeObject<List<Cat>>(jsonData);
+                table.DataContext = cats;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+    }
+
+    struct Cat
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
     }
 }

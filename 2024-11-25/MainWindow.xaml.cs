@@ -71,9 +71,25 @@ namespace _2024_11_25
                 MessageBox.Show(ex.Message);
             }
         }
+
+        private async void deleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            Cat cat = button.DataContext as Cat;
+            try
+            {
+                HttpResponseMessage response = await httpClient.DeleteAsync($"http://localhost:4444/api/cats?id={cat.Id}");
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            LoadData();
+        }
     }
 
-    struct Cat
+    class Cat
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -82,7 +98,7 @@ namespace _2024_11_25
         public DateTime UpdatedAt { get; set; }
     }
 
-    struct ApiErrorMsg
+    class ApiErrorMsg
     {
         public string Msg { get; set; }
     }

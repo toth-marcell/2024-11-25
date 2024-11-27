@@ -37,18 +37,19 @@ namespace _2024_11_25
                 name = nameField.Text,
                 age = ageField.Text
             }), Encoding.UTF8, "application/json");
-            try
+            HttpResponseMessage response = await httpClient.PostAsync("http://localhost:4444/api/cats", body);
+            if (response.IsSuccessStatusCode)
             {
-                HttpResponseMessage response = await httpClient.PostAsync("http://localhost:4444/api/cats", body);
-                response.EnsureSuccessStatusCode();
                 nameField.Text = "";
                 ageField.Text = "";
                 LoadData();
             }
-            catch (Exception ex)
+            else if ((int)response.StatusCode == 400)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(JsonConvert.DeserializeObject<ApiErrorMsg>(await response.Content.ReadAsStringAsync()).Msg);
             }
+            else MessageBox.Show(response.StatusCode.ToString());
+
         }
 
         async void LoadData()
@@ -60,6 +61,10 @@ namespace _2024_11_25
                 string jsonData = await response.Content.ReadAsStringAsync();
                 List<Cat> cats = JsonConvert.DeserializeObject<List<Cat>>(jsonData);
                 table.DataContext = cats;
+                numOfCatsText.DataContext = cats.Count;
+                IEnumerable<Cat> orderedCats = cats.OrderBy(x => x.Age);
+                oldestCatText.DataContext = orderedCats.Last().Name;
+                youngestCatText.DataContext = orderedCats.First().Name;
             }
             catch (Exception ex)
             {
@@ -73,5 +78,12 @@ namespace _2024_11_25
         public int Id { get; set; }
         public string Name { get; set; }
         public int Age { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+    }
+
+    struct ApiErrorMsg
+    {
+        public string Msg { get; set; }
     }
 }

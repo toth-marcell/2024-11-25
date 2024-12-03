@@ -95,8 +95,10 @@ namespace _2024_11_25
         public int Id { get; set; }
         public string Name { get; set; }
         public int Age { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime createdAt { private get; set; }
+        public DateTime updatedAt { private get; set; }
+        public string CreatedAt { get => createdAt.ToString("yyyy-MM-dd HH:mm"); }
+        public string UpdatedAt { get => updatedAt.ToString("yyyy-MM-dd HH:mm"); }
     }
 
     class ApiErrorMsg

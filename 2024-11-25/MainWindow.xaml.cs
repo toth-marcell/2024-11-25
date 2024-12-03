@@ -53,10 +53,19 @@ namespace _2024_11_25
                 string jsonData = await response.Content.ReadAsStringAsync();
                 List<Cat> cats = JsonConvert.DeserializeObject<List<Cat>>(jsonData);
                 table.DataContext = cats;
-                numOfCatsText.DataContext = cats.Count;
-                IEnumerable<Cat> orderedCats = cats.OrderBy(x => x.Age);
-                oldestCatText.DataContext = orderedCats.Last().Name;
-                youngestCatText.DataContext = orderedCats.First().Name;
+                if (cats.Count > 0)
+                {
+                    numOfCatsText.DataContext = cats.Count;
+                    IEnumerable<Cat> orderedCats = cats.OrderBy(x => x.Age);
+                    oldestCatText.DataContext = orderedCats.Last().Name;
+                    youngestCatText.DataContext = orderedCats.First().Name;
+                }
+                else
+                {
+                    numOfCatsText.DataContext = "";
+                    oldestCatText.DataContext = "";
+                    youngestCatText.DataContext = "";
+                }
             }
             catch (Exception ex)
             {

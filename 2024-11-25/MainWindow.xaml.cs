@@ -15,7 +15,8 @@ namespace _2024_11_25
     public partial class MainWindow : Window
     {
         readonly HttpClient httpClient = new HttpClient();
-
+        List<Cat> cats = new List<Cat>();
+        List<Cat> visibleCats = new List<Cat>();
         public MainWindow()
         {
             InitializeComponent();
@@ -51,25 +52,36 @@ namespace _2024_11_25
                 HttpResponseMessage response = await httpClient.GetAsync("http://localhost:4444/api/cats");
                 response.EnsureSuccessStatusCode();
                 string jsonData = await response.Content.ReadAsStringAsync();
-                List<Cat> cats = JsonConvert.DeserializeObject<List<Cat>>(jsonData);
-                table.DataContext = cats;
-                if (cats.Count > 0)
-                {
-                    numOfCatsText.DataContext = cats.Count;
-                    IEnumerable<Cat> orderedCats = cats.OrderBy(x => x.Age);
-                    oldestCatText.DataContext = orderedCats.Last().Name;
-                    youngestCatText.DataContext = orderedCats.First().Name;
-                }
-                else
-                {
-                    numOfCatsText.DataContext = "";
-                    oldestCatText.DataContext = "";
-                    youngestCatText.DataContext = "";
-                }
+                cats = JsonConvert.DeserializeObject<List<Cat>>(jsonData);
+                UpdateTable();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+        }
+
+        void UpdateTable()
+        {
+            if (cats.Count > 0)
+            {
+                visibleCats = new List<Cat>();
+                foreach (Cat cat in cats)
+                {
+                    if (cat.Name.Contains(searchBox.Text)) visibleCats.Add(cat);
+                }
+                table.DataContext = visibleCats;
+                if (cats.Count == visibleCats.Count) numOfCatsText.DataContext = cats.Count;
+                else numOfCatsText.DataContext = $"{cats.Count} ({visibleCats.Count} visible)";
+                IOrderedEnumerable<Cat> orderedCats = cats.OrderBy(x => x.Age);
+                oldestCatText.DataContext = orderedCats.Last().Name;
+                youngestCatText.DataContext = orderedCats.First().Name;
+            }
+            else
+            {
+                numOfCatsText.DataContext = "";
+                oldestCatText.DataContext = "";
+                youngestCatText.DataContext = "";
             }
         }
 
@@ -88,6 +100,8 @@ namespace _2024_11_25
             }
             LoadData();
         }
+
+        private void searchBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e) => UpdateTable();
     }
 
     class Cat

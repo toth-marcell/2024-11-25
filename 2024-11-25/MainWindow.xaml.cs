@@ -16,7 +16,6 @@ namespace _2024_11_25
     {
         readonly HttpClient httpClient = new HttpClient();
         List<Cat> cats = new List<Cat>();
-        List<Cat> visibleCats = new List<Cat>();
         public MainWindow()
         {
             InitializeComponent();
@@ -65,10 +64,15 @@ namespace _2024_11_25
         {
             if (cats.Count > 0)
             {
-                visibleCats = new List<Cat>();
-                foreach (Cat cat in cats)
+                List<Cat> visibleCats;
+                if (searchBox.Text == "") visibleCats = cats;
+                else
                 {
-                    if (cat.Name.Contains(searchBox.Text)) visibleCats.Add(cat);
+                    visibleCats = new List<Cat>();
+                    foreach (Cat cat in cats)
+                    {
+                        if (cat.Name.Contains(searchBox.Text)) visibleCats.Add(cat);
+                    }
                 }
                 table.DataContext = visibleCats;
                 if (cats.Count == visibleCats.Count) numOfCatsText.DataContext = cats.Count;

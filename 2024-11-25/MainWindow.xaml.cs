@@ -102,6 +102,11 @@ namespace _2024_11_25
         }
 
         private void searchBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e) => UpdateTable();
+
+        private void table_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            if (e.PropertyName.Contains("At")) e.Column.Header = e.PropertyName.Replace("A", " a");
+        }
     }
 
     class Cat
